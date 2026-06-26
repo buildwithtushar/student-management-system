@@ -26,7 +26,7 @@ public class GlobalExceptionHandler {
         return buildErrorResponseEntity(apiError);
     }
 
-    // Handles pre-checked duplicates (student code, double enrollment)
+
     @ExceptionHandler(DuplicateResourceException.class)
     public ResponseEntity<ApiResponse<?>> handleDuplicateResource(DuplicateResourceException exception) {
         ApiError apiError = ApiError.builder()
@@ -53,7 +53,7 @@ public class GlobalExceptionHandler {
         return buildErrorResponseEntity(apiError);
     }
 
-    // Fallback for any DB constraint violations that slip through pre-checks
+
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<ApiResponse<?>> handleDataIntegrityViolation(DataIntegrityViolationException exception) {
         log.warn("Data integrity violation: {}", exception.getMessage());

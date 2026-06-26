@@ -7,6 +7,7 @@ import com.platformcommons.sms.exception.ResourceNotFoundException;
 import com.platformcommons.sms.repository.CourseRepository;
 import com.platformcommons.sms.repository.StudentCourseRepository;
 import com.platformcommons.sms.repository.StudentRepository;
+import com.platformcommons.sms.repository.UserCredentialRepository;
 import com.platformcommons.sms.service.StudentService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,29 +28,43 @@ public class StudentServiceImpl implements StudentService {
     private final StudentRepository studentRepository;
     private final CourseRepository courseRepository;
     private final StudentCourseRepository studentCourseRepository;
+    private final UserCredentialRepository userCredentialRepository;
     private final ModelMapper modelMapper;
 
 
     @Override
     @Transactional
     public StudentResponse registerStudent(StudentRequest request) {
-        log.info("Processing student admission request. StudentCode=[{}]", request.getStudentCode());
+        log.info("Processing student admission for student code: {}", request.getStudentCode());
 
         if (studentRepository.existsByStudentCode(request.getStudentCode())) {
-            log.error("Registration failed. Student code {} already exists", request.getStudentCode());
-            throw new DuplicateResourceException(
-                    "Student code '" + request.getStudentCode() + "' is already registered in the system");
+            throw new DuplicateResourceException("Registration failed: Student code '"
+                    + request.getStudentCode() + "' is already assigned to a registered student.");
         }
 
         Student student = modelMapper.map(request, Student.class);
 
         if (student.getAddresses() != null) {
-            log.debug("Mapping back-references for [{}] explicit addresses on StudentCode=[{}]");
             student.getAddresses().forEach(address -> address.setStudent(student));
         }
 
         Student savedStudent = studentRepository.save(student);
-        log.info("Student successfully registered with database ID: {}", savedStudent.getId());
+
+        UserCredential studentCredential = new UserCredential();
+        studentCredential.setUsername(savedStudent.getStudentCode());
+
+
+        String rawPassword = savedStudent.getDateOfBirth().toString();
+        String encryptedPassword = org.springframework.security.crypto.bcrypt.BCrypt.hashpw(
+                rawPassword,
+                org.springframework.security.crypto.bcrypt.BCrypt.gensalt()
+        );
+
+        studentCredential.setPassword(encryptedPassword);
+        studentCredential.setRole("ROLE_STUDENT");
+
+        userCredentialRepository.save(studentCredential);
+        log.info("Successfully provisioned UserCredential login access role for student code: {}", savedStudent.getStudentCode());
 
         return buildStudentResponse(savedStudent);
     }
