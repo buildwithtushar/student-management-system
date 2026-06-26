@@ -1,5 +1,6 @@
 package com.platformcommons.sms.entity;
 
+import com.platformcommons.sms.entity.enums.Gender;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -25,20 +26,24 @@ public class Student {
     @Column(name = "date_of_birth", nullable = false)
     private LocalDate dateOfBirth;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "gender", nullable = false)
-    private String gender;
+    private Gender gender;
 
     @Column(name = "student_code", nullable = false, unique = true)
     private String studentCode;
 
-    @Column(name = "email",nullable = false,unique = true)
+    @Column(name = "email",unique = true)
     private String email;
 
-    @Column(name = "mobile_number",nullable = false)
+    @Column(name = "mobile_number")
     private String mobileNumber;
 
-    @Column(name = "parents_names",nullable = false)
-    private String parentsNames;
+    @Column(name = "father_name")
+    private String fatherName;
+
+    @Column(name = "mother_name")
+    private String motherName;
 
 
     @OneToMany(mappedBy = "student", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -47,5 +52,16 @@ public class Student {
 
     @OneToMany(mappedBy = "student", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<StudentCourse> studentCourses = new ArrayList<>();
+
+    public void addAddress(Address address) {
+        addresses.add(address);
+        address.setStudent(this);
+    }
+
+    public void removeAddress(Address address) {
+        addresses.remove(address);
+        address.setStudent(null);
+    }
+
 
 }

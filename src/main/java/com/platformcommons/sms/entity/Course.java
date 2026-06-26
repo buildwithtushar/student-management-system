@@ -38,4 +38,14 @@ public class Course {
     @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<StudentCourse> studentCourses = new ArrayList<>();
 
+    public void addTopic(CourseTopic topic) {
+        topics.add(topic);
+        topic.setCourse(this);
+    }
+
+    public void removeTopic(CourseTopic topic) {
+        topics.remove(topic);
+        topic.setCourse(null);
+    }
+
 }

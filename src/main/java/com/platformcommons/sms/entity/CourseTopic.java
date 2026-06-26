@@ -7,7 +7,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-@Table(name = "course_topic")
+@Table(name = "course_topics")
 public class CourseTopic {
 
     @Id
@@ -15,8 +15,8 @@ public class CourseTopic {
     @Column(name = "id", nullable = false)
     private Long id;
 
-    @Column(name = "topic", nullable = false)
-    private String topic;
+    @Column(name = "topic_name", nullable = false)
+    private String topicName;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "course_id", nullable = false)
