@@ -23,9 +23,6 @@ public class LoginService {
         if (byUsername.isPresent()) {
             UserCredential user = byUsername.get();
 
-            System.out.println("DEBUG - DB hash: " + user.getPassword());
-            System.out.println("DEBUG - checkpw result: " + BCrypt.checkpw(loginRequest.getPassword(), user.getPassword()));
-
             if (BCrypt.checkpw(loginRequest.getPassword(), user.getPassword())) {
                 String token = jwtService.generateToken(user.getUsername(), user.getRole());
                 String cleanRole = user.getRole().replace("ROLE_", "");
