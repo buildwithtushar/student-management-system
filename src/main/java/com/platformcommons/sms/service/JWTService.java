@@ -42,10 +42,6 @@ public class JWTService {
         return decodeToken(token).getClaim("name").asString();
     }
 
-    public String getRole(String token) {
-        return decodeToken(token).getClaim("role").asString();
-    }
-
     private DecodedJWT decodeToken(String token) {
         return JWT.require(algorithm)
                 .withIssuer(issuer)
