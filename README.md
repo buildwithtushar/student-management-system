@@ -334,7 +334,8 @@ The Entity-Relationship diagram is available at:
 
 📁 `docs/ER_Diagram.png`
 
-![Screenshot 2026-06-27 011644.png](../../OneDrive/Pictures/Screenshots/Screenshot%202026-06-27%20011644.png)
+<img width="1202" height="793" alt="Screenshot 2026-06-27 011644" src="https://github.com/user-attachments/assets/31069782-60b9-4bdb-8f5d-ad7eb0529938" />
+
 
 **Entity Relationships:**
 - `Student` ↔ `Address` — **One-to-Many** (a student can have multiple addresses: PERMANENT, CORRESPONDENCE, CURRENT)
