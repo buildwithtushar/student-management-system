@@ -1,0 +1,389 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > StudentServiceImpl</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.platformcommons.sms.service.impl</a>
+</div>
+
+<h1>Coverage Summary for Class: StudentServiceImpl (com.platformcommons.sms.service.impl)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">StudentServiceImpl</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (20/20)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    85%
+  </span>
+  <span class="absValue">
+    (17/20)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    98.4%
+  </span>
+  <span class="absValue">
+    (123/125)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.platformcommons.sms.service.impl;
+&nbsp;
+&nbsp;import com.platformcommons.sms.dto.*;
+&nbsp;import com.platformcommons.sms.entity.*;
+&nbsp;import com.platformcommons.sms.exception.DuplicateResourceException;
+&nbsp;import com.platformcommons.sms.exception.ResourceNotFoundException;
+&nbsp;import com.platformcommons.sms.repository.CourseRepository;
+&nbsp;import com.platformcommons.sms.repository.StudentCourseRepository;
+&nbsp;import com.platformcommons.sms.repository.StudentRepository;
+&nbsp;import com.platformcommons.sms.repository.UserCredentialRepository;
+&nbsp;import com.platformcommons.sms.service.StudentService;
+&nbsp;import lombok.RequiredArgsConstructor;
+&nbsp;import lombok.extern.slf4j.Slf4j;
+&nbsp;import org.modelmapper.ModelMapper;
+&nbsp;import org.springframework.data.domain.Page;
+&nbsp;import org.springframework.data.domain.Pageable;
+&nbsp;import org.springframework.stereotype.Service;
+&nbsp;import org.springframework.transaction.annotation.Transactional;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+<b class="fc">&nbsp;@Slf4j</b>
+&nbsp;@Service
+&nbsp;@RequiredArgsConstructor
+&nbsp;public class StudentServiceImpl implements StudentService {
+&nbsp;
+&nbsp;    private final StudentRepository studentRepository;
+&nbsp;    private final CourseRepository courseRepository;
+&nbsp;    private final StudentCourseRepository studentCourseRepository;
+&nbsp;    private final UserCredentialRepository userCredentialRepository;
+&nbsp;    private final ModelMapper modelMapper;
+&nbsp;
+&nbsp;
+&nbsp;    @Override
+&nbsp;    @Transactional
+&nbsp;    public StudentResponse registerStudent(StudentRequest request) {
+<b class="fc">&nbsp;        log.info(&quot;Processing student admission for student code: {}&quot;, request.getStudentCode());</b>
+&nbsp;
+<b class="fc">&nbsp;        if (studentRepository.existsByStudentCode(request.getStudentCode())) {</b>
+<b class="fc">&nbsp;            throw new DuplicateResourceException(&quot;Registration failed: Student code &#39;&quot;</b>
+<b class="fc">&nbsp;                    + request.getStudentCode() + &quot;&#39; is already assigned to a registered student.&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        Student student = modelMapper.map(request, Student.class);</b>
+&nbsp;
+<b class="pc">&nbsp;        if (student.getAddresses() != null) {</b>
+<b class="fc">&nbsp;            student.getAddresses().forEach(address -&gt; address.setStudent(student));</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        Student savedStudent = studentRepository.save(student);</b>
+&nbsp;
+<b class="fc">&nbsp;        UserCredential studentCredential = new UserCredential();</b>
+<b class="fc">&nbsp;        studentCredential.setUsername(savedStudent.getStudentCode());</b>
+&nbsp;
+&nbsp;
+<b class="fc">&nbsp;        String rawPassword = savedStudent.getDateOfBirth().toString();</b>
+<b class="fc">&nbsp;        String encryptedPassword = org.springframework.security.crypto.bcrypt.BCrypt.hashpw(</b>
+&nbsp;                rawPassword,
+<b class="fc">&nbsp;                org.springframework.security.crypto.bcrypt.BCrypt.gensalt()</b>
+&nbsp;        );
+&nbsp;
+<b class="fc">&nbsp;        studentCredential.setPassword(encryptedPassword);</b>
+<b class="fc">&nbsp;        studentCredential.setRole(&quot;ROLE_STUDENT&quot;);</b>
+&nbsp;
+<b class="fc">&nbsp;        userCredentialRepository.save(studentCredential);</b>
+<b class="fc">&nbsp;        log.info(&quot;Successfully provisioned UserCredential login access role for student code: {}&quot;, savedStudent.getStudentCode());</b>
+&nbsp;
+<b class="fc">&nbsp;        return buildStudentResponse(savedStudent);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    @Transactional
+&nbsp;    public void createCourse(CourseRequest request) {
+<b class="fc">&nbsp;        log.info(&quot;Creating a new course: {}&quot;, request.getCourseName());</b>
+&nbsp;
+<b class="fc">&nbsp;        Course course = modelMapper.map(request, Course.class);</b>
+&nbsp;
+<b class="fc">&nbsp;        if (request.getTopics() != null) {</b>
+<b class="fc">&nbsp;            log.debug(&quot;Compiling [{}] core syllabus structural modules for course allocation context&quot;, request.getTopics().size());</b>
+<b class="fc">&nbsp;            List&lt;CourseTopic&gt; topics = request.getTopics().stream()</b>
+<b class="fc">&nbsp;                    .map(topicName -&gt; {</b>
+<b class="fc">&nbsp;                        CourseTopic topic = new CourseTopic();</b>
+<b class="fc">&nbsp;                        topic.setTopicName(topicName);</b>
+<b class="fc">&nbsp;                        topic.setCourse(course);</b>
+<b class="fc">&nbsp;                        return topic;</b>
+<b class="fc">&nbsp;                    }).collect(Collectors.toList());</b>
+<b class="fc">&nbsp;            course.setTopics(topics);</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        courseRepository.save(course);</b>
+<b class="fc">&nbsp;        log.info(&quot;Course &#39;{}&#39; successfully saved.&quot;, request.getCourseName());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    @Transactional
+&nbsp;    public void enrollStudentInCourse(EnrollmentRequest request) {
+<b class="fc">&nbsp;        log.info(&quot;Enrolling student ID {} into course ID {}&quot;, request.getStudentId(), request.getCourseId());</b>
+&nbsp;
+<b class="fc">&nbsp;        Student student = studentRepository.findById(request.getStudentId())</b>
+<b class="fc">&nbsp;                .orElseThrow(() -&gt; {</b>
+<b class="fc">&nbsp;                    log.error(&quot;Enrollment failed. Student ID {} not found&quot;, request.getStudentId());</b>
+<b class="fc">&nbsp;                    return new ResourceNotFoundException(&quot;Student not found with ID: &quot; + request.getStudentId());</b>
+&nbsp;                });
+&nbsp;
+<b class="fc">&nbsp;        Course course = courseRepository.findById(request.getCourseId())</b>
+<b class="fc">&nbsp;                .orElseThrow(() -&gt; {</b>
+<b class="fc">&nbsp;                    log.error(&quot;Enrollment failed. Course ID {} not found&quot;, request.getCourseId());</b>
+<b class="fc">&nbsp;                    return new ResourceNotFoundException(&quot;Course not found with ID: &quot; + request.getCourseId());</b>
+&nbsp;                });
+&nbsp;
+<b class="fc">&nbsp;        if (studentCourseRepository.existsByStudentIdAndCourseId(student.getId(), course.getId())) {</b>
+<b class="fc">&nbsp;            log.warn(&quot;Student ID {} is already enrolled in course ID {}&quot;, student.getId(), course.getId());</b>
+<b class="fc">&nbsp;            throw new DuplicateResourceException(</b>
+<b class="fc">&nbsp;                    &quot;Student ID &quot; + student.getId() + &quot; is already enrolled in course ID &quot; + course.getId());</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        StudentCourse enrollment = new StudentCourse();</b>
+<b class="fc">&nbsp;        enrollment.setStudent(student);</b>
+<b class="fc">&nbsp;        enrollment.setCourse(course);</b>
+&nbsp;
+<b class="fc">&nbsp;        studentCourseRepository.save(enrollment);</b>
+<b class="fc">&nbsp;        log.info(&quot;Student ID {} successfully enrolled in course ID {}.&quot;, student.getId(), course.getId());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;    @Override
+&nbsp;    @Transactional
+&nbsp;    public void unenrollStudentFromCourse(Long studentId, Long courseId) {
+<b class="fc">&nbsp;        log.info(&quot;Unenrolling student ID {} from course ID {}&quot;, studentId, courseId);</b>
+&nbsp;
+<b class="fc">&nbsp;        StudentCourse enrollment = studentCourseRepository</b>
+<b class="fc">&nbsp;                .findByStudentIdAndCourseId(studentId, courseId)</b>
+<b class="fc">&nbsp;                .orElseThrow(() -&gt; {</b>
+<b class="fc">&nbsp;                    log.error(&quot;Unenrollment failed. No enrollment found for student ID {} and course ID {}&quot;,</b>
+&nbsp;                            studentId, courseId);
+<b class="fc">&nbsp;                    return new ResourceNotFoundException(</b>
+&nbsp;                            &quot;Enrollment not found for student ID &quot; + studentId + &quot; and course ID &quot; + courseId);
+&nbsp;                });
+&nbsp;
+<b class="fc">&nbsp;        studentCourseRepository.delete(enrollment);</b>
+<b class="fc">&nbsp;        log.info(&quot;Student ID {} successfully unenrolled from course ID {}.&quot;, studentId, courseId);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    @Transactional(readOnly = true)
+&nbsp;    public StudentResponse getStudentProfile(Long studentId) {
+<b class="fc">&nbsp;        log.info(&quot;Fetching profile details for student ID: {}&quot;, studentId);</b>
+&nbsp;
+<b class="fc">&nbsp;        Student student = studentRepository.findById(studentId)</b>
+<b class="fc">&nbsp;                .orElseThrow(() -&gt; {</b>
+<b class="fc">&nbsp;                    log.error(&quot;Profile fetch failed. Student ID {} not found&quot;, studentId);</b>
+<b class="fc">&nbsp;                    return new ResourceNotFoundException(&quot;Student profile not found with ID: &quot; + studentId);</b>
+&nbsp;                });
+&nbsp;
+<b class="fc">&nbsp;        return buildStudentResponse(student);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;    @Override
+&nbsp;    @Transactional
+&nbsp;    public StudentResponse updateStudentProfile(Long studentId, StudentUpdateRequest request) {
+<b class="fc">&nbsp;        log.info(&quot;Updating profile for student ID: {}&quot;, studentId);</b>
+&nbsp;
+<b class="fc">&nbsp;        Student student = studentRepository.findById(studentId)</b>
+<b class="fc">&nbsp;                .orElseThrow(() -&gt; {</b>
+<b class="fc">&nbsp;                    log.error(&quot;Update failed. Student ID {} not found&quot;, studentId);</b>
+<b class="fc">&nbsp;                    return new ResourceNotFoundException(&quot;Student not found with ID: &quot; + studentId);</b>
+&nbsp;                });
+&nbsp;
+&nbsp;
+<b class="fc">&nbsp;        if (request.getEmail() != null) {</b>
+<b class="fc">&nbsp;            student.setEmail(request.getEmail());</b>
+&nbsp;        }
+<b class="fc">&nbsp;        if (request.getMobileNumber() != null) {</b>
+<b class="fc">&nbsp;            student.setMobileNumber(request.getMobileNumber());</b>
+&nbsp;        }
+<b class="pc">&nbsp;        if (request.getFatherName() != null) {</b>
+<b class="nc">&nbsp;            student.setFatherName(request.getFatherName());</b>
+&nbsp;        }
+<b class="pc">&nbsp;        if (request.getMotherName() != null) {</b>
+<b class="nc">&nbsp;            student.setMotherName(request.getMotherName());</b>
+&nbsp;        }
+&nbsp;
+&nbsp;
+<b class="fc">&nbsp;        if (request.getAddresses() != null) {</b>
+<b class="fc">&nbsp;            student.getAddresses().clear();</b>
+<b class="fc">&nbsp;            request.getAddresses().forEach(dto -&gt; {</b>
+<b class="fc">&nbsp;                Address address = modelMapper.map(dto, Address.class);</b>
+<b class="fc">&nbsp;                student.addAddress(address); // sets back-reference too</b>
+&nbsp;            });
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        Student updatedStudent = studentRepository.save(student);</b>
+<b class="fc">&nbsp;        log.info(&quot;Profile updated successfully for student ID: {}&quot;, studentId);</b>
+&nbsp;
+<b class="fc">&nbsp;        return buildStudentResponse(updatedStudent);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    @Transactional(readOnly = true)
+&nbsp;    public Page&lt;StudentResponse&gt; searchStudentsByName(String name, Pageable pageable) {
+<b class="fc">&nbsp;        log.info(&quot;Searching students by name: &#39;{}&#39;, page: {}&quot;, name, pageable.getPageNumber());</b>
+&nbsp;
+<b class="fc">&nbsp;        return studentRepository</b>
+<b class="fc">&nbsp;                .findByNameContainingIgnoreCase(name, pageable)</b>
+<b class="fc">&nbsp;                .map(this::buildStudentResponse);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    @Transactional(readOnly = true)
+&nbsp;    public Page&lt;StudentResponse&gt; getStudentsByCourse(Long courseId, Pageable pageable) {
+<b class="fc">&nbsp;        log.info(&quot;Fetching students for course ID: {}, page: {}&quot;, courseId, pageable.getPageNumber());</b>
+&nbsp;
+<b class="fc">&nbsp;        if (!courseRepository.existsById(courseId)) {</b>
+<b class="fc">&nbsp;            throw new ResourceNotFoundException(&quot;Course not found with ID: &quot; + courseId);</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        return studentRepository</b>
+<b class="fc">&nbsp;                .findStudentsByCourseId(courseId, pageable)</b>
+<b class="fc">&nbsp;                .map(this::buildStudentResponse);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;    @Override
+&nbsp;    @Transactional(readOnly = true)
+&nbsp;    public Page&lt;CourseResponse&gt; searchCoursesByName(String courseName, Pageable pageable) {
+<b class="fc">&nbsp;        log.info(&quot;Searching courses by name: &#39;{}&#39;, page: {}&quot;, courseName, pageable.getPageNumber());</b>
+&nbsp;
+<b class="fc">&nbsp;        return courseRepository</b>
+<b class="fc">&nbsp;                .findByCourseNameContainingIgnoreCase(courseName, pageable)</b>
+<b class="fc">&nbsp;                .map(this::buildCourseResponse);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    @Transactional(readOnly = true)
+&nbsp;    public Page&lt;CourseResponse&gt; searchCoursesByTopic(String topicName, Pageable pageable) {
+<b class="fc">&nbsp;        log.info(&quot;Searching courses by topic: &#39;{}&#39;, page: {}&quot;, topicName, pageable.getPageNumber());</b>
+&nbsp;
+<b class="fc">&nbsp;        return courseRepository</b>
+<b class="fc">&nbsp;                .findCoursesByTopicName(topicName, pageable)</b>
+<b class="fc">&nbsp;                .map(this::buildCourseResponse);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private StudentResponse buildStudentResponse(Student student) {
+<b class="fc">&nbsp;        List&lt;String&gt; courseNames = student.getStudentCourses().stream()</b>
+<b class="fc">&nbsp;                .map(sc -&gt; sc.getCourse().getCourseName())</b>
+<b class="fc">&nbsp;                .collect(Collectors.toList());</b>
+&nbsp;
+<b class="fc">&nbsp;        return StudentResponse.builder()</b>
+<b class="fc">&nbsp;                .id(student.getId())</b>
+<b class="fc">&nbsp;                .name(student.getName())</b>
+<b class="fc">&nbsp;                .studentCode(student.getStudentCode())</b>
+<b class="fc">&nbsp;                .email(student.getEmail())</b>
+<b class="fc">&nbsp;                .enrolledCourses(courseNames)</b>
+<b class="fc">&nbsp;                .build();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private CourseResponse buildCourseResponse(Course course) {
+<b class="fc">&nbsp;        List&lt;String&gt; topicNames = course.getTopics().stream()</b>
+<b class="fc">&nbsp;                .map(CourseTopic::getTopicName)</b>
+<b class="fc">&nbsp;                .collect(Collectors.toList());</b>
+&nbsp;
+<b class="fc">&nbsp;        return CourseResponse.builder()</b>
+<b class="fc">&nbsp;                .id(course.getId())</b>
+<b class="fc">&nbsp;                .courseName(course.getCourseName())</b>
+<b class="fc">&nbsp;                .description(course.getDescription())</b>
+<b class="fc">&nbsp;                .courseType(course.getCourseType())</b>
+<b class="fc">&nbsp;                .durationMonths(course.getDurationMonths())</b>
+<b class="fc">&nbsp;                .topics(topicNames)</b>
+<b class="fc">&nbsp;                .build();</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-06-27 11:48</div>
+</div>
+</body>
+</html>

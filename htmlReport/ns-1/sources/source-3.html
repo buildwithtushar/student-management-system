@@ -1,0 +1,91 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > StudentService</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.platformcommons.sms.service</a>
+</div>
+
+<h1>Coverage Summary for Class: StudentService (com.platformcommons.sms.service)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+</tr>
+<tr>
+  <td class="name">StudentService</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.platformcommons.sms.service;
+&nbsp;
+&nbsp;import com.platformcommons.sms.dto.*;
+&nbsp;import com.platformcommons.sms.entity.Student;
+&nbsp;import org.springframework.data.domain.Page;
+&nbsp;import org.springframework.data.domain.Pageable;
+&nbsp;
+&nbsp;public interface StudentService {
+&nbsp;    StudentResponse registerStudent(StudentRequest request);
+&nbsp;    void createCourse(CourseRequest request);
+&nbsp;    void enrollStudentInCourse(EnrollmentRequest request);
+&nbsp;    StudentResponse getStudentProfile(Long studentId);
+&nbsp;
+&nbsp;    StudentResponse updateStudentProfile(Long studentId, StudentUpdateRequest request);
+&nbsp;    void unenrollStudentFromCourse(Long studentId, Long courseId);
+&nbsp;
+&nbsp;    Page&lt;StudentResponse&gt; searchStudentsByName(String name, Pageable pageable);
+&nbsp;    Page&lt;StudentResponse&gt; getStudentsByCourse(Long courseId, Pageable pageable);
+&nbsp;
+&nbsp;    Page&lt;CourseResponse&gt; searchCoursesByName(String courseName, Pageable pageable);
+&nbsp;    Page&lt;CourseResponse&gt; searchCoursesByTopic(String topicName, Pageable pageable);
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-06-27 11:48</div>
+</div>
+</body>
+</html>
