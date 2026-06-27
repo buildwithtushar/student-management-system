@@ -372,6 +372,64 @@ It covers:
 
 ---
 
+## 🧪 Test Coverage
+
+Unit tests are written in **TDD format** using **JUnit 5** and **Mockito**, covering both the Service and Controller layers.
+
+### Coverage Report — `StudentServiceImpl`
+
+| Class | Class % | Method % | Branch % | Line % |
+|---|---|---|---|---|
+| `StudentServiceImpl` | **100%** (1/1) | **100%** (20/20) | **85%** (17/20) | **98.4%** (123/125) |
+
+> Coverage report generated via IntelliJ IDEA's built-in coverage runner.
+
+---
+
+### What's Tested
+
+#### Service Layer — `StudentServiceImplTest` (25 tests)
+
+| Method | Scenarios Covered |
+|---|---|
+| `registerStudent()` | ✅ Happy path · ✅ Duplicate student code → 409 · ✅ Address back-reference set · ✅ `ROLE_STUDENT` credential auto-provisioned |
+| `getStudentProfile()` | ✅ Student found · ✅ Student not found → 404 · ✅ Enrolled course names in response |
+| `updateStudentProfile()` | ✅ Email + mobile update · ✅ Null fields not overwritten · ✅ Addresses replaced · ✅ Student not found → 404 |
+| `createCourse()` | ✅ Course with topics · ✅ Course with null topics |
+| `enrollStudentInCourse()` | ✅ Successful enrollment · ✅ Already enrolled → 409 · ✅ Student not found → 404 · ✅ Course not found → 404 |
+| `unenrollStudentFromCourse()` | ✅ Enrollment deleted · ✅ Enrollment not found → 404 |
+| `searchStudentsByName()` | ✅ Matching results · ✅ Empty page |
+| `searchCoursesByName()` | ✅ Matching results |
+| `searchCoursesByTopic()` | ✅ Matching results · ✅ Empty page |
+
+---
+
+### Running Tests
+
+```bash
+# Run all tests
+mvn test
+
+# Run with coverage report (generates to target/site/jacoco)
+mvn test jacoco:report
+```
+
+To view the HTML coverage report after running:
+```
+target/site/jacoco/index.html
+```
+
+### Test File Locations
+
+```
+src/test/java/com/platformcommons/sms/
+└── service/
+    └── impl/
+        └── StudentServiceImplTest.java   # 25 tests — pure Mockito
+```
+
+---
+
 ## 📞 Contact
 
 For any queries regarding this assignment:
