@@ -1,6 +1,6 @@
 package com.platformcommons.sms.entity;
 
-import com.platformcommons.sms.entity.enums.Gender;
+import com.platformcommons.sms.entity.enums.GenderType;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -28,7 +28,7 @@ public class Student {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "gender", nullable = false)
-    private Gender gender;
+    private GenderType gender;
 
     @Column(name = "student_code", nullable = false, unique = true)
     private String studentCode;

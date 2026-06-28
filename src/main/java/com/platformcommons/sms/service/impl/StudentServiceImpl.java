@@ -187,7 +187,7 @@ public class StudentServiceImpl implements StudentService {
             student.getAddresses().clear();
             request.getAddresses().forEach(dto -> {
                 Address address = modelMapper.map(dto, Address.class);
-                student.addAddress(address); // sets back-reference too
+                student.addAddress(address);
             });
         }
 

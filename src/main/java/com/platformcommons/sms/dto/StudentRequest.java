@@ -1,7 +1,7 @@
 package com.platformcommons.sms.dto;
 
 import com.platformcommons.sms.entity.enums.AddressType;
-import com.platformcommons.sms.entity.enums.Gender;
+import com.platformcommons.sms.entity.enums.GenderType;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import lombok.Getter;
@@ -22,7 +22,7 @@ public class StudentRequest {
     private LocalDate dateOfBirth;
 
     @NotNull(message = "gender must not be null")
-    private Gender gender;
+    private GenderType gender;
 
     @NotBlank(message = "studentCode must not be blank")
     private String studentCode;

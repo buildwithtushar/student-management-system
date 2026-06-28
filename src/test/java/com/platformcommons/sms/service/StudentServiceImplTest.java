@@ -4,7 +4,7 @@ import com.platformcommons.sms.dto.*;
 import com.platformcommons.sms.entity.*;
 import com.platformcommons.sms.entity.enums.AddressType;
 import com.platformcommons.sms.entity.enums.CourseType;
-import com.platformcommons.sms.entity.enums.Gender;
+import com.platformcommons.sms.entity.enums.GenderType;
 import com.platformcommons.sms.exception.DuplicateResourceException;
 import com.platformcommons.sms.exception.ResourceNotFoundException;
 import com.platformcommons.sms.repository.*;
@@ -59,7 +59,7 @@ class StudentServiceImplTest {
         student.setStudentCode("STU001");
         student.setEmail("john@example.com");
         student.setDateOfBirth(LocalDate.of(2000, 5, 15));
-        student.setGender(Gender.MALE);
+        student.setGender(GenderType.MALE);
         student.setStudentCourses(new ArrayList<>());
         student.setAddresses(new ArrayList<>());
 
@@ -582,7 +582,7 @@ class StudentServiceImplTest {
         StudentRequest request = new StudentRequest();
         request.setName("John Doe");
         request.setDateOfBirth(LocalDate.of(2000, 5, 15));
-        request.setGender(Gender.MALE);
+        request.setGender(GenderType.MALE);
         request.setStudentCode("STU001");
         request.setEmail("john@example.com");
         request.setMobileNumber("9876543210");
