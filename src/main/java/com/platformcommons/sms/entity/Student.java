@@ -58,10 +58,5 @@ public class Student {
         address.setStudent(this);
     }
 
-    public void removeAddress(Address address) {
-        addresses.remove(address);
-        address.setStudent(null);
-    }
-
 
 }
