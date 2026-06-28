@@ -23,18 +23,18 @@ A **REST API** built with **Spring Boot** for managing student admissions, cours
 
 ## 🛠 Tech Stack
 
-| Layer | Technology |
-|---|---|
-| Framework | Spring Boot 3.5 |
-| Language | Java 25 |
-| Database | MySQL 8 |
-| ORM | JPA with Hibernate 6 |
+| Layer | Technology                            |
+|---|---------------------------------------|
+| Framework | Spring Boot 3.5                       |
+| Language | Java 17                               |
+| Database | MySQL 8                               |
+| ORM | JPA with Hibernate                    |
 | Security | Spring Security + JWT (Auth0 java-jwt) |
-| API Docs | Swagger / SpringDoc OpenAPI 2.8 |
-| Build Tool | Maven |
-| Mapping | ModelMapper |
-| Validation | Jakarta Bean Validation |
-| Utilities | Lombok |
+| API Docs | Swagger / SpringDoc OpenAPI 2.8       |
+| Build Tool | Maven                                 |
+| Mapping | ModelMapper                           |
+| Validation | Jakarta Bean Validation               |
+| Utilities | Lombok                                |
 
 ---
 
